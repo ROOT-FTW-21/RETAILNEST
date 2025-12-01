@@ -7,16 +7,17 @@ import org.springframework.stereotype.Component;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 
 @Component
 public class JwtUtil {
 
-	private final String SECRET_KEY = "5367566B59703373367639792F423F4528482B4D6251655468576D5A71347437";
+	private final String SECRET_KEY = "1U4tHxxlhyGLhwaHnKy/1l59Z+O0jGblMuKqHPBU+nU=";
 
 	public Claims extractAllClaims(String token) throws JwtException {
-		return Jwts.parserBuilder().setSigningKey(Keys.hmacShaKeyFor(SECRET_KEY.getBytes())).build()
-				.parseClaimsJws(token).getBody();
+		byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY); // <-- Correctly decode the Base64 string
+		return Jwts.parserBuilder().setSigningKey(Keys.hmacShaKeyFor(keyBytes)).build().parseClaimsJws(token).getBody();
 	}
 
 	public String extractUserIdentifier(String token) {

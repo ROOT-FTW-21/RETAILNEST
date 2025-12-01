@@ -3,6 +3,8 @@ package com.retailnest.auth_service.service.componentService.impl;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -19,7 +21,7 @@ import com.retailnest.auth_service.service.componentService.IAuthComponentServic
 public class AuthComponentServiceImpl implements IAuthComponentService {
 	@Autowired
 	private IUserRepository userRepository;
-	
+
 	private static final String HIGH_DATE = "31-12-9999 00:00:00";
 
 	@Override
@@ -32,8 +34,9 @@ public class AuthComponentServiceImpl implements IAuthComponentService {
 	public List<AuthResponseDTO> getAllUsers() {
 		DateTimeFormatter dateFormat1 = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
 		LocalDateTime endDate = LocalDateTime.parse(HIGH_DATE, dateFormat1);
-		
-		return userRepository.findByRecordEndDateAndDeletedFlag(endDate, 'N');
+
+		return userRepository.findByRecordEndDateAndDeletedFlag(endDate, 'N').stream().filter(Objects::nonNull)
+				.map(e -> UserMapper.toDTO(e)).collect(Collectors.toList());
 	}
 
 	@Override
@@ -44,7 +47,8 @@ public class AuthComponentServiceImpl implements IAuthComponentService {
 	}
 
 	/*
-	 * @Override public UserEntity getUserByUserLegacyNumber(String userLegacyNumber) {
+	 * @Override public UserEntity getUserByUserLegacyNumber(String
+	 * userLegacyNumber) {
 	 * iUserRepository.findUserByUserLegacyNumber(userLegacyNumber); }
 	 */
 

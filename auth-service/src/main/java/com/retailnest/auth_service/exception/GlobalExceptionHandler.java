@@ -68,4 +68,13 @@ public class GlobalExceptionHandler {
     	
     	return ResponseEntity.badRequest().body(errors);
     }
+    
+    @ExceptionHandler(UnauthorizedException.class)
+    public ResponseEntity<Map<String, String>> handleUnauthorizedException(UnauthorizedException exception) {
+    	Map<String, String> errors = new HashMap<String, String>();
+    	errors.put("message", exception.getMessage());
+    	log.warn(exception.getMessage());
+    	
+    	return ResponseEntity.badRequest().body(errors);
+    }
 }

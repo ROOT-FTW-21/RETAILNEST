@@ -17,7 +17,7 @@ public interface IUserRepository extends JpaRepository<UserEntity, Long> {
 
 	UserEntity findByUserid(String userId);
 
-	List<AuthResponseDTO> findByRecordEndDateAndDeletedFlag(LocalDateTime endDate, char c);
+	List<UserEntity> findByRecordEndDateAndDeletedFlag(LocalDateTime endDate, char c);
 
     //AppUser findByUsername(String identifier);
 }

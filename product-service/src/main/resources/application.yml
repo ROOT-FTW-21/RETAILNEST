@@ -1,0 +1,41 @@
+spring:
+  application:
+    name: product-service
+  config:
+    import: optional:configserver:http://localhost:9092
+  profiles:
+    active: default  # Replace 'default' with your actual profile name if needed
+
+  datasource:
+    url: jdbc:postgresql://localhost:5001/retailnest-product-service-db-dev
+    username: retailnest_admin
+    password: retailnest_admin
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+logging:
+  level:
+    root: info
+    org.springframework.web: DEBUG
+    org.springframework.web.servlet.DispatcherServlet: DEBUG
+    org.springframework.web.filter.CommonsRequestLoggingFilter: DEBUG
+    org:
+      springframework:
+        jdbc: DEBUG
+        orm: DEBUG
+
+server:
+  port: 9094
+
+cloudinary:
+  cloud_name: dgvkx5lwn
+  api_key: 315322877781987
+  api_secret: J_CuwRnDkpn7y5oSUB4iqOsocsc
+  secure: true

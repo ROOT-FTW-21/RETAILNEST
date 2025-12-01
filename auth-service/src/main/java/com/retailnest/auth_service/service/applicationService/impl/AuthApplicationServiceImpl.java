@@ -3,6 +3,8 @@ package com.retailnest.auth_service.service.applicationService.impl;
 import java.text.ParseException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -15,6 +17,7 @@ import com.retailnest.auth_service.entity.UserEntity;
 import com.retailnest.auth_service.entity.UserRolesEntity;
 import com.retailnest.auth_service.exception.EmailAlreadyExistsException;
 import com.retailnest.auth_service.exception.MobileAlreadyExistsException;
+import com.retailnest.auth_service.exception.UnauthorizedException;
 import com.retailnest.auth_service.exception.UserIdAlreadyExistsException;
 import com.retailnest.auth_service.service.applicationService.IAuthApplicationService;
 import com.retailnest.auth_service.service.componentService.IAuthComponentService;
@@ -80,5 +83,27 @@ public class AuthApplicationServiceImpl implements IAuthApplicationService {
 		UserEntity savedUser = authComponentService.saveUser(userEntity);
 
 		return UserMapper.toDTO(savedUser);
+	}
+
+	@Override
+	public List<AuthResponseDTO> getAllUsers(String currentUserId, String userRolesString) {
+		List<String> roles = Arrays.asList(userRolesString.split(","));
+		
+		if (roles.contains("ADMIN")) {
+			return authComponentService.getAllUsers();
+		} else {
+			throw new UnauthorizedException("User ID: " + currentUserId + " with roles " + userRolesString + " is not allowed for this request.");
+		}
+	}
+
+	@Override
+	public AuthResponseDTO getUserById(Long id, String userid, String roles) {
+		List<String> roleList = Arrays.asList(roles.split(","));
+		
+		if (roleList.contains("ADMIN") || roleList.contains("MAINTENANCE")) {
+			return authComponentService.getUserById(id);
+		} else {
+			throw new UnauthorizedException("User ID: " + userid + " with roles " + roles + " is not allowed for this request.");
+		}
 	}
 }
