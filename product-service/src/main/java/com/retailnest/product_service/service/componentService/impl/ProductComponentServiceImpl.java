@@ -7,6 +7,8 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import com.retailnest.product_service.dto.ProductResponseDTO;
@@ -18,9 +20,9 @@ import com.retailnest.product_service.service.componentService.IProductComponent
 
 @Service
 public class ProductComponentServiceImpl implements IProductComponentService {
-	
+
 	private static final String HIGH_DATE = "31-12-9999 00:00:00";
-	
+
 	@Autowired
 	private IProductRepository repository;
 
@@ -30,37 +32,44 @@ public class ProductComponentServiceImpl implements IProductComponentService {
 	}
 
 	@Override
+	@Cacheable(value = "products", key = "#productId")
 	public ProductEntity getProductById(Long productId) {
 		return repository.findById(productId)
 				.orElseThrow(() -> new ProductNotFoundException("Product with ID: " + productId + " not found"));
 	}
-	
+
 	@Override
+	@Cacheable(value = "activeProductsWithChildren")
 	public List<ProductResponseDTO> findActiveProductsWithChildren() {
 		DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
 		LocalDateTime endDate = LocalDateTime.parse(HIGH_DATE, dateFormat);
-		
+
 		List<ProductEntity> entity = repository.findActiveProductsWithChildren(endDate);
-		
-		return entity.stream().filter(Objects::nonNull).map(Objects -> ProductMapper.toDto(Objects)).collect(Collectors.toList());
+
+		return entity.stream().filter(Objects::nonNull).map(Objects -> ProductMapper.toDto(Objects))
+				.collect(Collectors.toList());
 	}
 
 	@Override
+	@Cacheable(value = "activeProductsWithImages")
 	public List<ProductResponseDTO> findActiveProductsWithImages() {
 		DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
 		LocalDateTime endDate = LocalDateTime.parse(HIGH_DATE, dateFormat);
-		
+
 		List<ProductEntity> entity = repository.findActiveProductsWithImages(endDate);
-		
-		return entity.stream().filter(Objects::nonNull).map(Objects -> ProductMapper.toDto(Objects)).collect(Collectors.toList());
+
+		return entity.stream().filter(Objects::nonNull).map(Objects -> ProductMapper.toDto(Objects))
+				.collect(Collectors.toList());
 	}
 
 	@Override
-	public ProductEntity findProductByIdWithChildren(Long id) {
-		return repository.findProductByIdWithChildren(id);
+	@Cacheable(value = "products", key = "#id")
+	public ProductResponseDTO findProductByIdWithChildren(Long id) {
+		return ProductMapper.toDto(repository.findProductByIdWithChildren(id));
 	}
 
 	@Override
+	@CachePut(value = "products", key = "#result.id")
 	public ProductEntity updateProductDetails(ProductEntity productEntity) {
 		return repository.save(productEntity);
 	}

@@ -140,7 +140,7 @@ public class ProductApplicationServiceImpl implements IProductApplicationService
 		List<String> roleList = Arrays.asList(roles.split(","));
 
 		if (roleList.contains(ROLE_ADMIN) || roleList.contains(ROLE_MAINTAINANCE)) {
-			return ProductMapper.toDto(componentService.findProductByIdWithChildren(id));
+			return componentService.findProductByIdWithChildren(id);
 		} else {
 			throw new AccessUnauthorizedException("User: " + userid + " whith roles: " + roles + " is not authorized.");
 		}

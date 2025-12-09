@@ -18,7 +18,7 @@ public interface IProductComponentService {
 
 	List<ProductResponseDTO> findActiveProductsWithImages();
 
-	ProductEntity findProductByIdWithChildren(Long id);
+	ProductResponseDTO findProductByIdWithChildren(Long id);
 
 	ProductEntity updateProductDetails(ProductEntity productEntity);
 
